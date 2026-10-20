@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>IZTECHMUN Allocations</title>
+  <title>IZTECH MUN Allocations</title>
   <style>
     :root {
       --bg: #f4f6fb;
@@ -94,13 +94,12 @@
     .result { display: none; }
     .result .label { color: var(--muted); font-size: .85rem; margin: 16px 0 0; }
     .result .value { font-size: 1.35rem; font-weight: 700; margin: 0; overflow-wrap: anywhere; }
-    .link { background: none; color: var(--accent); margin-top: 10px; }
   </style>
 </head>
 <body>
   <main>
     <div class="top">
-      <h1>IZTECHMUN</h1>
+      <h1>IZTECH MUN</h1>
       <div class="lang" role="group" aria-label="Language / Dil">
         <button type="button" data-lang="tr">TR</button>
         <button type="button" data-lang="en">EN</button>
@@ -118,12 +117,9 @@
     <section id="result" class="result" aria-live="polite">
       <p class="label" data-i18n="delegate"></p>
       <p class="value" id="r-name"></p>
-      <p class="label" data-i18n="committee"></p>
-      <p class="value" id="r-committee"></p>
       <p class="label" data-i18n="country"></p>
       <p class="value" id="r-country"></p>
       <a id="r-guide" class="btn" target="_blank" rel="noopener" data-i18n="guide"></a>
-      <button id="back" class="link" type="button" data-i18n="back"></button>
     </section>
   </main>
 
@@ -133,16 +129,14 @@
 
     const TEXT = {
       tr: {
-        subtitle: 'Ülke tahsisini ve çalışma kılavuzunu görüntüle.',
+        subtitle: 'Ülke atamanı ve çalışma kılavuzunu görüntüle.',
         inputLabel: 'Öğrenci numarası veya e-posta',
         placeholder: 'örn. 290201001 veya ad@std.iyte.edu.tr',
-        submit: 'Tahsisimi göster',
+        submit: 'Ülke atamamı göster',
         loading: 'Aranıyor…',
         delegate: 'Delege',
-        committee: 'Komite',
         country: 'Ülke',
         guide: 'Çalışma kılavuzunu aç',
-        back: 'Başka birini ara',
         empty: 'Lütfen öğrenci numaranı veya e-postanı gir.',
         not_found: 'Bu öğrenci numarası veya e-posta bulunamadı. Kontrol edip tekrar dene ya da organizasyon ekibiyle iletişime geç.',
         not_configured: 'Sistem henüz hazır değil. Lütfen organizasyon ekibiyle iletişime geç.',
@@ -155,10 +149,8 @@
         submit: 'Show my allocation',
         loading: 'Looking up…',
         delegate: 'Delegate',
-        committee: 'Committee',
         country: 'Country',
         guide: 'Open study guide',
-        back: 'Look up someone else',
         empty: 'Please enter your student number or email.',
         not_found: 'We couldn\'t find that student number or email. Check it and try again, or contact the organisers.',
         not_configured: 'The system isn\'t ready yet. Please contact the organisers.',
@@ -205,7 +197,6 @@
           return;
         }
         $('r-name').textContent = data.name;
-        $('r-committee').textContent = data.committee;
         $('r-country').textContent = data.country;
         $('r-guide').href = data.guide;
         $('r-guide').style.display = data.guide ? 'block' : 'none';
@@ -217,13 +208,6 @@
         submit.disabled = false;
         submit.textContent = TEXT[lang].submit;
       }
-    });
-
-    $('back').addEventListener('click', () => {
-      result.style.display = 'none';
-      form.style.display = 'block';
-      $('id').value = '';
-      $('id').focus();
     });
   </script>
 </body>
