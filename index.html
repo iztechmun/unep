@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IZTECHMUN Allocations</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #1b2233;
+      --muted: #5d6680;
+      --accent: #1f4fa3;
+      --accent-text: #ffffff;
+      --border: #d8deea;
+      --error: #b3261e;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1420;
+        --card: #182030;
+        --text: #e8ecf5;
+        --muted: #9aa5bf;
+        --accent: #6f9bff;
+        --accent-text: #0f1420;
+        --border: #2a3448;
+        --error: #ff8a80;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5;
+    }
+    main {
+      width: 100%;
+      max-width: 460px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 20px;
+    }
+    @media (min-width: 768px) {
+      main { max-width: 520px; padding: 40px 44px; }
+      h1 { font-size: 1.85rem; }
+    }
+    .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    h1 { margin: 0 0 4px; font-size: 1.5rem; }
+    p.sub { margin: 0 0 24px; color: var(--muted); }
+    .lang { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+    .lang button {
+      width: auto; margin: 0; padding: 6px 12px; border-radius: 0;
+      font-size: .85rem; background: transparent; color: var(--muted);
+    }
+    .lang button[aria-pressed="true"] { background: var(--accent); color: var(--accent-text); }
+    label { display: block; font-weight: 600; margin-bottom: 6px; }
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem; /* 16px stops iOS from zooming on focus */
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    button, .btn {
+      display: block;
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      text-align: center;
+      text-decoration: none;
+      border: 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: var(--accent-text);
+      cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: wait; }
+    .error { color: var(--error); margin-top: 14px; }
+    .result { display: none; }
+    .result .label { color: var(--muted); font-size: .85rem; margin: 16px 0 0; }
+    .result .value { font-size: 1.35rem; font-weight: 700; margin: 0; overflow-wrap: anywhere; }
+    .link { background: none; color: var(--accent); margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="top">
+      <h1>IZTECHMUN</h1>
+      <div class="lang" role="group" aria-label="Language / Dil">
+        <button type="button" data-lang="tr">TR</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+    </div>
+    <p class="sub" data-i18n="subtitle"></p>
+
+    <form id="form">
+      <label for="id" data-i18n="inputLabel"></label>
+      <input id="id" name="id" autocomplete="email" required>
+      <button id="submit" type="submit" data-i18n="submit"></button>
+      <div id="error" class="error" role="alert"></div>
+    </form>
+
+    <section id="result" class="result" aria-live="polite">
+      <p class="label" data-i18n="delegate"></p>
+      <p class="value" id="r-name"></p>
+      <p class="label" data-i18n="committee"></p>
+      <p class="value" id="r-committee"></p>
+      <p class="label" data-i18n="country"></p>
+      <p class="value" id="r-country"></p>
+      <a id="r-guide" class="btn" target="_blank" rel="noopener" data-i18n="guide"></a>
+      <button id="back" class="link" type="button" data-i18n="back"></button>
+    </section>
+  </main>
+
+  <script>
+    // Paste your Apps Script web app URL here (ends in /exec).
+    const API_URL = 'https://script.google.com/macros/s/AKfycbw45KFJV798u_BYdqNFcbD8ZwxS8K4QiAl2XUpngk09y_4QNtEM8CYEXih9ANechhyBdw/exec';
+
+    const TEXT = {
+      tr: {
+        subtitle: 'Ülke tahsisini ve çalışma kılavuzunu görüntüle.',
+        inputLabel: 'Öğrenci numarası veya e-posta',
+        placeholder: 'örn. 290201001 veya ad@std.iyte.edu.tr',
+        submit: 'Tahsisimi göster',
+        loading: 'Aranıyor…',
+        delegate: 'Delege',
+        committee: 'Komite',
+        country: 'Ülke',
+        guide: 'Çalışma kılavuzunu aç',
+        back: 'Başka birini ara',
+        empty: 'Lütfen öğrenci numaranı veya e-postanı gir.',
+        not_found: 'Bu öğrenci numarası veya e-posta bulunamadı. Kontrol edip tekrar dene ya da organizasyon ekibiyle iletişime geç.',
+        not_configured: 'Sistem henüz hazır değil. Lütfen organizasyon ekibiyle iletişime geç.',
+        generic: 'Bir hata oluştu. Lütfen biraz sonra tekrar dene.'
+      },
+      en: {
+        subtitle: 'Find your country allocation and study guide.',
+        inputLabel: 'Student number or email',
+        placeholder: 'e.g. 290201001 or name@std.iyte.edu.tr',
+        submit: 'Show my allocation',
+        loading: 'Looking up…',
+        delegate: 'Delegate',
+        committee: 'Committee',
+        country: 'Country',
+        guide: 'Open study guide',
+        back: 'Look up someone else',
+        empty: 'Please enter your student number or email.',
+        not_found: 'We couldn\'t find that student number or email. Check it and try again, or contact the organisers.',
+        not_configured: 'The system isn\'t ready yet. Please contact the organisers.',
+        generic: 'Something went wrong. Please try again in a moment.'
+      }
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const form = $('form'), result = $('result'), error = $('error'), submit = $('submit');
+    let lang, errorKey = '';
+
+    function setLang(l) {
+      lang = l;
+      document.documentElement.lang = l;
+      document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = TEXT[l][el.dataset.i18n]; });
+      document.querySelectorAll('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.lang === l));
+      $('id').placeholder = TEXT[l].placeholder;
+      if (submit.disabled) submit.textContent = TEXT[l].loading;
+      error.textContent = errorKey ? TEXT[l][errorKey] : '';
+      try { localStorage.setItem('lang', l); } catch (_) {}
+    }
+
+    document.querySelectorAll('[data-lang]').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang)));
+
+    let saved = null;
+    try { saved = localStorage.getItem('lang'); } catch (_) {}
+    setLang(TEXT[saved] ? saved : (navigator.language || '').toLowerCase().startsWith('tr') ? 'tr' : 'en');
+
+    function showError(key) {
+      errorKey = key;
+      error.textContent = key ? TEXT[lang][key] : '';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      showError('');
+      submit.disabled = true;
+      submit.textContent = TEXT[lang].loading;
+      try {
+        const res = await fetch(API_URL + '?id=' + encodeURIComponent($('id').value.trim()));
+        const data = await res.json();
+        if (!data.ok) {
+          showError(TEXT[lang][data.error] ? data.error : 'generic');
+          return;
+        }
+        $('r-name').textContent = data.name;
+        $('r-committee').textContent = data.committee;
+        $('r-country').textContent = data.country;
+        $('r-guide').href = data.guide;
+        $('r-guide').style.display = data.guide ? 'block' : 'none';
+        form.style.display = 'none';
+        result.style.display = 'block';
+      } catch (_) {
+        showError('generic');
+      } finally {
+        submit.disabled = false;
+        submit.textContent = TEXT[lang].submit;
+      }
+    });
+
+    $('back').addEventListener('click', () => {
+      result.style.display = 'none';
+      form.style.display = 'block';
+      $('id').value = '';
+      $('id').focus();
+    });
+  </script>
+</body>
+</html>
